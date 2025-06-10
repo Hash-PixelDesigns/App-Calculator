@@ -23,6 +23,14 @@ function appendToDisplay(value) {
     // If the current display show 0 and the user enters decimal, keep the 0
     else if (currentValue === "0" && value === ".") {
         display.value = currentValue + value;
+    } else if (value === ".") {
+        //Get the last number in the display
+        let lastNumber = currentValue.split('/[+\_*/]').pop();
+        //Only add the decimal if the current number does not have it
+        if (lastNumber.includes ('.')) {
+            display.value = currentValue + value
+        }
+
     } else {
         display.value = currentValue + value;
     }
@@ -38,7 +46,13 @@ function appendToDisplay(value) {
 function clearDisplay() {
     console.log ('Clear button pressed.');
 
-    alert ('Clear button clicked.');
+    display.vale = '0';
+    justCalculated = false;
+
+    display.style.backgroundColor = '#f0f0f0';
+    setTimeout (() => {
+        display.style.backgroundColor = '';
+    },1000);
 }
 
 function deleteLast() {
@@ -53,7 +67,6 @@ function deleteLast() {
         display.value = currentValue.slice(0,-1);
     }
 
-    alert ('Backspace button clicked.');
 }
 
 function calculate () {
@@ -61,6 +74,33 @@ function calculate () {
 
     alert ('Equals button clicked.');
 }
+
+document.addEventListener('keydown', function(addEventListener){
+    console.log('Key pressed',Event.key);
+
+    if(Event.key >= '0' && Event.key <= '9') {
+        appendToDisplay(Event.key);
+    } else if (Event.key === '.'){
+        appendToDisplay ('.');
+    } else if (Event.key === '+') {
+        appendToDisplay ('+');
+    } else if (Event.key === '-') {
+        appendToDisplay ('-');
+    } else if (Event.key === '*') {
+        appendToDisplay ('*');
+    } else if (Event.key === '/') {
+        Event.preventDefault ();
+        appendToDisplay ('/');
+    }
+
+    else if (Event.key === 'Enter' || Event.key === '=') {
+        calculate ();
+    } else if (Event.key === 'Escape' || Event.key === 'c'|| Event.key === 'C') {
+        clearDisplay();
+    } else if (Event.key === 'Backspace') {
+        deleteLast
+    }
+})
 
 document.addEventListener('DOMContentLoaded',function() {
     console.log('Calculator loaded successfully');
