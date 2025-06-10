@@ -4,6 +4,14 @@ const display = document.getElementById('display');
 //Track if we have performed a calculation
 let justCalculated = false;
 
+function isOperator (char) {
+    return ['+','-','*','/'].includes(char)
+}
+
+function getLastChar() {
+    return display.value.slice(-1);
+}
+
 function appendToDisplay(value) {
     console.log ('Button pressed:',value);
     
@@ -15,12 +23,40 @@ function appendToDisplay(value) {
         return;
     }
 
-    // If current display show 0 and user enters a number, we want to replace the 0
-    if (currentValue === "0" && !isNaN(value)) {
-        display.value = value;
+    if (justCalculated && isOperator(value)) {
+        display.value = currentValue + value;
+        justCalculated = false;
+        return;
     }
 
-    // If the current display show 0 and the user enters decimal, keep the 0
+    //Handles Operators
+    if (isOperator(value)) {
+        //Dont allow operator as the first char (exception for minus)
+        if (currentValue=== '0' && value !== '-') {
+            return; // Do Nothing
+        }
+
+        //If the last character is already an operator, repl;ace it
+        if (isOperator(getLastChar())) {
+            display.value = currentValue.slice (0,-1) + value;
+        } else {
+            display.value = currentValue + value;
+        }
+    } else if (!isNaN(value)) {
+        if (currentValue === '0') {
+            display.value = currentValue + value;
+        } else {
+            //Get the last nukmber in the display (after last operator)
+            let parts = currentValue.split ('/[+\-*/');
+            let lastNumber = parts[parts.length - 1];
+
+            //Only add decimal is number doesn't already have one
+            if (!lastNumber.includes('.')) {
+                display.value = currentValue + value;
+            }
+        }
+    } 
+
     else if (currentValue === "0" && value === ".") {
         display.value = currentValue + value;
     } else if (value === ".") {
@@ -52,7 +88,7 @@ function clearDisplay() {
     display.style.backgroundColor = '#f0f0f0';
     setTimeout (() => {
         display.style.backgroundColor = '';
-    },1000);
+    },180);
 }
 
 function deleteLast() {
@@ -104,7 +140,7 @@ document.addEventListener('keydown', function(addEventListener){
 
 document.addEventListener('DOMContentLoaded',function() {
     console.log('Calculator loaded successfully');
-    console,log('Display element',display);
+    console.log('Display element',display);
 
     if (display) {
         console.log ('Current display value: ',display.value);
